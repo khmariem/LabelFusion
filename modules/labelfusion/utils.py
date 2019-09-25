@@ -308,6 +308,7 @@ def getFilenames(logFolder):
     d['registrationResult'] = os.path.join(getLabelFusionDataDir(), logFolder, "registration_result.yaml")
     d['reconstruction'] = os.path.join(getLabelFusionDataDir(), logFolder, "reconstructed_pointcloud.vtp")
     d['aboveTablePointcloud'] = os.path.join(getLabelFusionDataDir(), logFolder, "above_table_pointcloud.vtp")
+    d['objectPointCloud'] = os.path.join(getLabelFusionDataDir(), logFolder, "object_pointcloud.vtp")
     d['images'] = os.path.join(getLabelFusionDataDir(), logFolder, "images")
     d['topLevelFolder'] = os.path.join(getLabelFusionDataDir(), logFolder)
     d['transforms'] = os.path.join(getLabelFusionDataDir(), logFolder, 'transforms.yaml')

@@ -146,6 +146,12 @@ class GlobalRegistration(object):
             vis.updatePolyData(croppedPointCloud, 'cropped pointcloud')
 
         return croppedPointCloud
+    
+    ###### This function was added to fulfill a functionality that is not available in the original code ################
+    def savePointCloud(self):
+        objectPointCloud = om.findObjectByName('cropped pointcloud').polyData
+        ioUtils.writePolyData(objectPointCloud, self.pathDict['objectPointcloud'])
+    ###### End of the added functionality ###############################################################################
 
     def segmentTable(self, scenePolyData=None, searchRadius=0.3, visualize=True,
                      thickness=0.01, pointOnTable=None, pointAboveTable=None):
