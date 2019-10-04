@@ -216,7 +216,7 @@ class RenderTrainingImages(object):
 
         return True
 
-    def saveObjectPoses(self, imageFilename, cameraToCameraStart, baseName):
+    def saveObjectPosesBboxes(self, imageFilename, cameraToCameraStart, baseName):
         # count pixels
         img = scipy.misc.imread(imageFilename)
         assert img.dtype == np.uint8
@@ -230,14 +230,38 @@ class RenderTrainingImages(object):
         labelToCount = dict(zip(labels, counts))
 
         num_pixels_per_class = np.array([])
+        bbxs = []
 
         for i in xrange(0, img.max()+1):
             num_pixels = labelToCount.get(i, 0)
             num_pixels_per_class = np.append(num_pixels_per_class, num_pixels)
 
+            res = np.where(img == i)
+
+            if num_pixels>0:
+                xmax= np.max(res[0])
+                xmin=np.min(res[0])
+                ymax=np.max(res[1])
+                ymin=np.min(res[1])
+
+                cx=(xmax+xmin)/2
+                cy=(ymax+ymin)/2
+
+                h=ymax-ymin+1
+                w=xmax-xmin+1
+            else:
+                cx=0
+                cy=0
+                h=0
+                w=0
+
+            bbxs.append([cx,cy,w,h])
+
         pose_file_name = baseName + "_poses.yaml"
-        target = open(pose_file_name, 'w')
-        print 'writing:', pose_file_name
+        bbx_file_name = baseName + "_rgb.txt"
+        target_pose = open(pose_file_name, 'w')
+        target_bbx = open(bbx_file_name, 'w')
+        print 'writing:', pose_file_name + " & " + bbx_file_name
 
         # iterate through each class with 1 or more pixel and save pose...
         for index, val in enumerate(num_pixels_per_class):
@@ -247,20 +271,25 @@ class RenderTrainingImages(object):
             if val > 0:
                 cameraStartToCamera = cameraToCameraStart.GetLinearInverse()
                 objectName = utils.getObjectName(self.objectData, index)
-                target.write(objectName + ":")
-                target.write("\n")
-                target.write("  label: " + str(index))
-                target.write("\n")
-                target.write("  num_pixels: " + str(val))
-                target.write("\n")
+                target_pose.write(objectName + ":")
+                target_pose.write("\n")
+                target_pose.write("  label: " + str(index))
+                target_pose.write("\n")
+                target_pose.write("  num_pixels: " + str(val))
+                target_pose.write("\n")
                 objToCameraStart = self.objectToWorld[objectName]
                 objToCamera = transformUtils.concatenateTransforms([objToCameraStart, cameraStartToCamera])
                 pose = transformUtils.poseFromTransform(objToCamera)
                 poseAsList = [pose[0].tolist(), pose[1].tolist()]
-                target.write("  pose: " + str(poseAsList))
-                target.write("\n")
+                target_pose.write("  pose: " + str(poseAsList))
+                target_pose.write("\n")
+                target_bbx.write(str(index))
+                for el in bbxs[index]:
+                    target_bbx.write(" " + str(el))
+                target_bbx.write("\n")
 
-        target.close()
+        target_pose.close()
+        target_bbx.close()
                 
     def renderAndSaveLabeledImages(self):
         imageNumber = 1
