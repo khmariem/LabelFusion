@@ -212,7 +212,7 @@ class RenderTrainingImages(object):
             self.captureLabelImage(baseName + '_labels.png')
 
         if savePoses:
-            self.saveObjectPoses(imageFilename.replace("_rgb.png", "_labels.png"), cameraToCameraStart, baseName)
+            self.saveObjectPosesBboxes(imageFilename.replace("_rgb.png", "_labels.png"), cameraToCameraStart, baseName)
 
         return True
 
